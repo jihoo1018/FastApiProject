@@ -1,20 +1,19 @@
-from datetime import datetime
+
 from typing import List, Optional
-from uuid import UUID
 from pydantic import BaseModel
 from app.schemas.article import Article
 
 
-class User(BaseModel):
-    user_id : Optional[UUID]
-    email : str
-    nickname : str
-    password : str
-    create_at: Optional[datetime]
-    updated_at: Optional[datetime]
+class UserDTO(BaseModel):
+    user_id : Optional[str]
+    email : Optional[str]
+    password : Optional[str]
+    nickname : Optional[str]
+    create_at: Optional[str]
+    updated_at: Optional[str]
 
     class Config:
         orm_mode = True
 
-class UserDetail(User):
+class UserDetail(UserDTO):
     articles: List[Article] = []
