@@ -1,0 +1,29 @@
+from abc import abstractmethod, ABCMeta
+from typing import List
+from sqlalchemy.orm import Session
+from app.models.user import Article
+from app.schemas.user import ArticleDTO
+
+
+class ArticleBase(metaclass=ABCMeta):
+
+    @abstractmethod
+    def add_user(self, request_user:UserDTO)-> str: pass
+
+    @abstractmethod
+    def login(self, request_user: UserDTO) -> User: pass
+
+    @abstractmethod
+    def update_user(self, request_user: UserDTO) -> str: pass
+
+    @abstractmethod
+    def delete_user(self, request_user: UserDTO) -> str: pass
+
+    @abstractmethod
+    def find_al_users(self, page: int) -> List[User]: pass
+
+    @abstractmethod
+    def find_user_by_id(self, request_user: UserDTO) -> UserDTO: pass
+
+    @abstractmethod
+    def find_user_by_email(self, request_user: UserDTO) -> str: pass

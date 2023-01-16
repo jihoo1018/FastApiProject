@@ -6,3 +6,6 @@ pymysql
 pandas
 FastAPI-SQLAlchemy == 0.2.1
 sqlalchemy-utils
+pyjwt
+shortuuid
+passlib
