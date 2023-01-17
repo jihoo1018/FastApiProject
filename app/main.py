@@ -3,6 +3,8 @@ import os
 import sys
 from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import HTMLResponse
+
 from .admin.utils import current_time
 from .database import init_db
 from .env import DB_URL
@@ -10,6 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 baseurl = os.path.dirname(os.path.abspath(__file__))
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from .routers.user import router as user_router
+from .test.user import router as test_router
 from .routers.article import router as article_router
 from fastapi.security import APIKeyHeader
 API_TOKEN = "SECRET_API_TOKEN"
@@ -20,6 +23,7 @@ print(f" ################ app.main Started At {current_time()} #################
 router = APIRouter()
 router.include_router(user_router, prefix="/user",tags=["user"])
 router.include_router(article_router, prefix="/article",tags=["article"])
+router.include_router(test_router, prefix="/test",tags=["test"])
 app = FastAPI()
 origins = ["http://localhost:3000"]
 app.add_middleware(
@@ -48,7 +52,15 @@ async def on_startup():
 
 @app.get("/")
 async def root():
-    return {"message ": " Welcome Fastapi"}
+    return HTMLResponse(content=f"""
+    <body>
+    <div >
+        <h1 style="width: 400px; margin: 50 auto">
+        {current_time()}<br/>
+        현재 서버 구동중 입니다</h1>
+    </div>
+    </body>
+    """)
 
 @app.get("/hello/{name}")
 async def say_hello(name: str):

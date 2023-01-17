@@ -4,7 +4,10 @@ from sqlalchemy.orm import relationship
 from app.database import Base
 from sqlalchemy_utils import UUIDType
 
-class Article(Base):
+from app.models.mixins import TimestampMixin
+
+
+class Article(Base,TimestampMixin):
 
     __tablename__ = 'article'
 

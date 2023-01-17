@@ -36,8 +36,9 @@ async def login(dto: UserDTO, db: Session = Depends(get_db)):
         if login_user is not None:
             print(f"로그인 성공정보: \n {login_user}")
             new_token = generate_token(login_user.email)
+            print(f"발표된 토큰 : {new_token}")
             login_user.token = new_token
-            result = {"data":login_user}
+            result = login_user
         else:
             print(f"로그인 실패")
             result = JSONResponse(status_code=400, content = dict(msg="비밀번호가 일치하지 않습니다"))
@@ -76,4 +77,3 @@ async def get_users_by_job(search:str, page: int, db: Session = Depends(get_db))
     user_crud = UserCrud(db)
     user_crud.find_users_by_job(search, page,db)
     return {"data": "success"}
-
