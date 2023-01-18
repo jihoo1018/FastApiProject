@@ -8,7 +8,7 @@ from app.schemas.article import ArticleDTO
 class ArticleBase(metaclass=ABCMeta):
 
     @abstractmethod
-    def write(self, request_article:ArticleDTO)-> str: pass
+    def add_article(self, request_article:ArticleDTO)-> str: pass
 
     @abstractmethod
     def update_article(self, request_article: ArticleDTO) -> str: pass
@@ -24,3 +24,6 @@ class ArticleBase(metaclass=ABCMeta):
 
     @abstractmethod
     def find_articles_by_title(self, request_article: ArticleDTO) -> str: pass
+
+    @abstractmethod
+    def find_article_by_seq(self, request_article: ArticleDTO) -> ArticleDTO: pass

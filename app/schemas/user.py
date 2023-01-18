@@ -23,3 +23,14 @@ class UserDTO(BaseModel):
 
 class UserDetail(UserDTO):
     articles: List[ArticleDTO] = []
+
+class UserUpdate(BaseModel):
+    user_id: Optional[str]
+    phone: Optional[str]
+    job: Optional[str]
+    interests: Optional[str]
+    modified: Optional[str]
+    token: Optional[str]
+
+    class Config:
+        orm_mode = True

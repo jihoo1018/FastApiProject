@@ -1,76 +1,74 @@
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
 from app.cruds.user import UserCrud
 from app.admin.security import get_hashed_password, generate_token
 from app.admin.utils import current_time
 from app.database import get_db
-from app.schemas.user import UserDTO
+from app.schemas.user import UserDTO, UserUpdate
 
 router = APIRouter()
 
 @router.post("/join", status_code=201)
 async def register_user(dto: UserDTO, db: Session = Depends(get_db)):
-    print(f" 회원가입에 진입한 시간: {current_time()} ")
-    print(f"SignUp Inform : {dto}")
-    user_crud = UserCrud(db)
-    userid = user_crud.find_user_by_email(request_user=dto)
-    if userid == "":
-        print(f" 해시 전 비번 {dto.password}")
-        dto.password = get_hashed_password(dto.password)
-        print(f" 해시 후 비번 {dto.password}")
-        result = user_crud.add_user(request_user=dto)
-    else:
-        result = JSONResponse(status_code=400, content=dict(msg="이메일이 이미 존재합니다"))
-    return {"data": result}
+    return JSONResponse(status_code=200,
+                        content=dict(
+                            msg=UserCrud(db).add_user(request_user=dto)))
 
 @router.post("/login", status_code=200)
-async def login(dto: UserDTO, db: Session = Depends(get_db)):
-    user_crud = UserCrud(db)
-    user_id = user_crud.find_user_by_email(request_user=dto)
-    dto.user_id = user_id
-    print(f"로그인 보내기전에 확인 id : {dto.user_id}, pw:{dto.password}")
-    if user_id !="":
-        login_user = user_crud.login(request_user=dto)
-        if login_user is not None:
-            print(f"로그인 성공정보: \n {login_user}")
-            new_token = generate_token(login_user.email)
-            print(f"발표된 토큰 : {new_token}")
-            login_user.token = new_token
-            result = login_user
-        else:
-            print(f"로그인 실패")
-            result = JSONResponse(status_code=400, content = dict(msg="비밀번호가 일치하지 않습니다"))
+async def login_user(dto: UserDTO, db: Session = Depends(get_db)):
+    return JSONResponse(status_code=200,
+                        content=dict(
+                            msg=UserCrud(db).login_user(request_user=dto)))
+@router.post("/load")
+async def load_user(dto: UserDTO, db: Session = Depends(get_db)):
+    if UserCrud(db).match_token(request_user=dto):
+        return JSONResponse(status_code=200,
+                            content=jsonable_encoder(
+                                UserCrud(db).find_user_by_token(request_user=dto)))
     else:
-        result = JSONResponse(status_code=400, content=dict(msg="이메일 주소가 존재하지 않습니다"))
-    return result
+        RedirectResponse(url='/no-match-token', status_code=302)
 
 
+@router.put("/modify")
+async def modify_user(dto: UserUpdate, db: Session = Depends(get_db)):
+    if UserCrud(db).match_token(request_user=dto):
+        return JSONResponse(status_code=200,
+                            content=dict(
+                                msg=UserCrud(db).update_user(dto)))
+    else:
+        RedirectResponse(url='/no-match-token', status_code=302)
 
-@router.put("/modify/{id}")
-async def update(id:str, item: UserDTO, db: Session = Depends(get_db)):
-    user_crud = UserCrud(db)
-    user_crud.update(id,item,db)
-    return {"data": "success"}
-
-@router.delete("/delete/{id}", tags=['age'])
-async def delete(id:str, item: UserDTO, db: Session = Depends(get_db)):
-    user_crud = UserCrud(db)
-    user_crud.delete(id,item,db)
-    return {"data": "success"}
+@router.put("/reset-password")
+async def reset_password(dto: UserDTO, db: Session = Depends(get_db)):
+    if UserCrud(db).match_token(request_user=dto):
+        return JSONResponse(status_code=200,
+                        content=dict(
+                            msg=UserCrud(db).reset_password(dto)))
+    else:
+        RedirectResponse(url='/no-match-token', status_code=302)
+@router.delete("/delete", tags=['age'])
+async def remove_user(dto: UserDTO, db: Session = Depends(get_db)):
+    if UserCrud(db).match_token(request_user=dto):
+        return JSONResponse(status_code=200,
+                            content=dict(
+                                msg=UserCrud(db).delete_user(dto)))
+    else:
+        RedirectResponse(url='/no-match-token', status_code=302)
 
 @router.get("/page/{page}")
-async def get_users(page: int, db: Session = Depends(get_db)):
-    user_crud = UserCrud(db)
-    ls = user_crud.find_users(page,db)
-    return {"data": ls}
+async def get_users_per_page(page: int, db: Session = Depends(get_db)):
+    return JSONResponse(status_code=200,
+                        content=jsonable_encoder(
+                            UserCrud(db).find_all_users_per_page(page,db)))
 
-@router.get("/email/{id}")
+'''@router.get("/email/{id}")
 async def get_user(id: str, db: Session = Depends(get_db)):
     user_crud = UserCrud(db)
-    user_crud.find_user(id, db)
-    return {"data": "success"}
+    user_crud.find_user_by_id(id, db)
+    return {"data": "success"}'''
 
 @router.get("/job/{search}/{page}")
 async def get_users_by_job(search:str, page: int, db: Session = Depends(get_db)):
