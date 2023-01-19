@@ -34,3 +34,20 @@ class UserUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+class Configbase(BaseModel):
+    class Config:
+        orm_mode = True
+
+
+class PageUser(Configbase):
+    user_id: Optional[str]
+    email: Optional[str]
+    password: Optional[str]
+    username: Optional[str]
+    phone: Optional[str]
+    birth: Optional[str]
+    address: Optional[str]
+    job: Optional[str]
+    interests: Optional[str]
+    token: Optional[str]

@@ -6,5 +6,6 @@ def current_time():
 def utc_seoul():
     return datetime.now(pytz.timezone('Asia/Seoul'))
 
+
 if __name__ == '__main__':
     print(f" 현재 서울시간: {utc_seoul()}")

@@ -2,7 +2,7 @@ from abc import ABC
 from typing import List
 
 from sqlalchemy import select
-
+from fastapi_pagination import paginate, Page
 from app.admin.security import verify_password, generate_token, get_hashed_password
 from app.bases.user import UserBase
 from app.database import conn
@@ -12,6 +12,7 @@ import pymysql
 from sqlalchemy.orm import Session
 pymysql.install_as_MySQLdb()
 
+
 class UserCrud(UserBase,ABC):
 
     def __init__(self, db: Session):
@@ -19,10 +20,17 @@ class UserCrud(UserBase,ABC):
 
     def add_user(self, request_user: UserDTO) -> str:
         user = User(**request_user.dict())
-        is_success = self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-        return "" if is_success != 0 else ""
+        user_id = self.find_user_by_email(request_user=request_user)
+        if user_id == "":
+            user.password = get_hashed_password(user.password)
+            is_success = self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
+            message = "SUCCESS: 회원가입이 완료되었습니다" \
+                if is_success != 0 else "FAILURE: 비정상적인 이유로 회원가입이 실패하였습니다"
+        else:
+            message = "FAILURE: 이메일이 이미 존재합니다"
+        return message
 
     def login_user(self, request_user: UserDTO) -> str:
         user_id = self.find_user_by_email(request_user=request_user)
@@ -40,6 +48,14 @@ class UserCrud(UserBase,ABC):
                 return "FAILURE: 비밀번호가 일치하지 않습니다"
         else:
             return "FAILURE: 이메일 주소가 존재하지 않습니다"
+
+    def logout_user(self, request_user: UserDTO) -> str:
+        user = self.find_user_by_token(request_user)
+        is_success = self.db.query(User).filter(User.user_id == user.user_id). \
+            update({User.token: ""}, synchronize_session=False)
+        self.db.commit()
+        print(f"토큰 삭제되면 1 리턴 예상함 : {is_success}")
+        return "LOGOUT"
 
 
     def update_user(self, request_user: UserUpdate) -> str:
@@ -76,7 +92,7 @@ class UserCrud(UserBase,ABC):
 
     def find_all_users_per_page(self, page: int) -> List[User]:
         print(f" page number is {page}")
-        return self.db.query(User).all()
+        return self.db.query(User).order_by(User.created).all()
 
     def find_user_by_token(self, request_user: UserDTO) -> User:
         user = User(**request_user.dict())
@@ -103,4 +119,7 @@ class UserCrud(UserBase,ABC):
             return ""
     def find_all_users(self, db: Session, skip: int = 0, limit: int = 100):
         return db.query(User).offset(skip).limit(limit).all()
+
+    def count_all_users(self) -> int:
+        return self.db.query(User).count()
 

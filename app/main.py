@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+
+from fastapi_pagination import add_pagination
 from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
@@ -25,6 +27,7 @@ router.include_router(user_router, prefix="/user",tags=["user"])
 router.include_router(article_router, prefix="/article",tags=["article"])
 router.include_router(test_router, prefix="/test",tags=["test"])
 app = FastAPI()
+add_pagination(app)
 origins = ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,

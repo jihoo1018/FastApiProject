@@ -14,6 +14,9 @@ class UserBase(metaclass=ABCMeta):
     def login_user(self, request_user: UserDTO) -> User: pass
 
     @abstractmethod
+    def logout_user(self, request_user: UserDTO) -> str : pass
+
+    @abstractmethod
     def update_user(self, request_user: UserUpdate): pass
 
     @abstractmethod
@@ -35,3 +38,6 @@ class UserBase(metaclass=ABCMeta):
     def find_user_by_email(self, request_user: UserDTO) -> str: pass
     @abstractmethod
     def match_token(self, request_user: UserDTO) -> bool: pass
+
+    @abstractmethod
+    def count_all_users(self) ->int : pass
