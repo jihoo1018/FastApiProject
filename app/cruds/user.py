@@ -94,6 +94,9 @@ class UserCrud(UserBase,ABC):
         print(f" page number is {page}")
         return self.db.query(User).order_by(User.created).all()
 
+    def find_all_users_order_by_created(self) -> List[User]:
+        return self.db.query(User).order_by(User.created).all()
+
     def find_user_by_token(self, request_user: UserDTO) -> User:
         user = User(**request_user.dict())
         return self.db.query(User).filter(User.token == user.token).one_or_none()

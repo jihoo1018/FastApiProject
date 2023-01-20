@@ -15,6 +15,7 @@ baseurl = os.path.dirname(os.path.abspath(__file__))
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from .routers.user import router as user_router
 from .test.user import router as test_router
+from .admin.pagination import router as pagination_router
 from .routers.article import router as article_router
 from fastapi.security import APIKeyHeader
 API_TOKEN = "SECRET_API_TOKEN"
@@ -26,6 +27,7 @@ router = APIRouter()
 router.include_router(user_router, prefix="/user",tags=["user"])
 router.include_router(article_router, prefix="/article",tags=["article"])
 router.include_router(test_router, prefix="/test",tags=["test"])
+router.include_router(pagination_router, prefix="/pagination",tags=["pagination"])
 app = FastAPI()
 add_pagination(app)
 origins = ["http://localhost:3000"]
