@@ -6,10 +6,10 @@ from fastapi_pagination import add_pagination
 from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
-
+from mangum import Mangum
 from .admin.utils import current_time
 from .database import init_db
-from .env import DB_URL
+from .env_localhost import DB_URL
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 baseurl = os.path.dirname(os.path.abspath(__file__))
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
