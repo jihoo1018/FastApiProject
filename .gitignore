@@ -21,6 +21,8 @@ docs_build
 venv
 docs.zip
 archive.zip
+docker
+requirements.txt
 
 # vim temporary files
 *~

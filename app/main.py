@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-
 from fastapi_pagination import add_pagination
 from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +15,7 @@ from .routers.user import router as user_router
 from .test.user import router as test_router
 from .admin.pagination import router as pagination_router
 from .routers.article import router as article_router
+from .routers.chatbot import router as chatbot_router
 from fastapi.security import APIKeyHeader
 API_TOKEN = "SECRET_API_TOKEN"
 api_key_header = APIKeyHeader(name="Token")
@@ -26,6 +26,7 @@ router = APIRouter()
 router.include_router(user_router, prefix="/user",tags=["user"])
 router.include_router(article_router, prefix="/article",tags=["article"])
 router.include_router(test_router, prefix="/test",tags=["test"])
+router.include_router(chatbot_router, prefix="/chatbot",tags=["chatbot"])
 router.include_router(pagination_router, prefix="/pagination",tags=["pagination"])
 app = FastAPI()
 add_pagination(app)
