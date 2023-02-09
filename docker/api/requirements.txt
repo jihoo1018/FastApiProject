@@ -182,6 +182,7 @@ wincertstore==0.2
 win-inet-pton
 wincertstore==0.2
 wordcloud
+yolov5==7.0.8
 zipp==3.8.0
 
 
